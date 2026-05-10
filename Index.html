@@ -1,0 +1,901 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The Architecture of Us — Happy 22nd, Rahayu</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Jost:wght@200;300;400&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --beige: #F5F0E8;
+    --beige-dark: #EDE5D8;
+    --charcoal: #2C2C2C;
+    --charcoal-light: #4A4A4A;
+    --rose-gold: #B8866A;
+    --rose-gold-light: #D4A87A;
+    --rose-gold-muted: #C9967A22;
+    --cream: #FAF7F2;
+    --text-muted: #8A7E72;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--cream);
+    color: var(--charcoal);
+    font-family: 'Jost', sans-serif;
+    font-weight: 300;
+    overflow-x: hidden;
+  }
+
+  /* ── HERO ── */
+  #hero {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    overflow: hidden;
+    background: linear-gradient(160deg, var(--beige) 0%, #E8D9CC 50%, var(--beige-dark) 100%);
+  }
+
+  #particle-canvas {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    opacity: .45;
+  }
+
+  .hero-inner {
+    position: relative;
+    z-index: 2;
+    text-align: center;
+    padding: 2rem;
+    animation: fadeUp 1.4s ease both;
+  }
+
+  .hero-eyebrow {
+    font-family: 'Jost', sans-serif;
+    font-weight: 200;
+    font-size: .75rem;
+    letter-spacing: .35em;
+    text-transform: uppercase;
+    color: var(--rose-gold);
+    margin-bottom: 2rem;
+  }
+
+  .hero-title {
+    font-family: 'Cormorant Garamond', serif;
+    font-weight: 300;
+    font-size: clamp(2.4rem, 6vw, 5.2rem);
+    line-height: 1.12;
+    color: var(--charcoal);
+    margin-bottom: 1rem;
+  }
+
+  .hero-title em {
+    font-style: italic;
+    color: var(--rose-gold);
+  }
+
+  .hero-dates {
+    font-family: 'Jost', sans-serif;
+    font-weight: 200;
+    font-size: .8rem;
+    letter-spacing: .3em;
+    color: var(--text-muted);
+    margin-bottom: 2.5rem;
+  }
+
+  .hero-copy {
+    font-family: 'Cormorant Garamond', serif;
+    font-style: italic;
+    font-size: clamp(1rem, 2.2vw, 1.25rem);
+    color: var(--charcoal-light);
+    max-width: 520px;
+    line-height: 1.8;
+  }
+
+  .hero-ornament {
+    margin: 2.5rem auto 0;
+    width: 1px;
+    height: 80px;
+    background: linear-gradient(to bottom, var(--rose-gold), transparent);
+  }
+
+  /* ── SHARED SECTION ── */
+  section {
+    padding: 7rem 1.5rem;
+  }
+
+  .container {
+    max-width: 860px;
+    margin: 0 auto;
+  }
+
+  .section-label {
+    font-family: 'Jost', sans-serif;
+    font-weight: 200;
+    font-size: .7rem;
+    letter-spacing: .35em;
+    text-transform: uppercase;
+    color: var(--rose-gold);
+    display: block;
+    margin-bottom: 1rem;
+    text-align: center;
+  }
+
+  /* ── PHOTO ── */
+  #photo-section {
+    background: var(--beige);
+  }
+
+  .photo-frame {
+    position: relative;
+    max-width: 420px;
+    margin: 3rem auto 2rem;
+  }
+
+  .photo-frame img {
+    width: 100%;
+    border-radius: 48% 52% 42% 58% / 45% 55% 45% 55%;
+    display: block;
+    filter: sepia(.08) contrast(1.04);
+    box-shadow: 0 20px 60px rgba(44,44,44,.14), 0 4px 16px rgba(184,134,106,.18);
+    transition: border-radius .6s ease;
+  }
+
+  .photo-frame:hover img {
+    border-radius: 50%;
+  }
+
+  .photo-ring {
+    position: absolute;
+    inset: -16px;
+    border-radius: 50%;
+    border: 1px solid var(--rose-gold-light);
+    opacity: .45;
+    pointer-events: none;
+    animation: spin 22s linear infinite;
+  }
+
+  .photo-ring::after {
+    content: '';
+    position: absolute;
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    background: var(--rose-gold);
+    top: 50%; left: -4px;
+    transform: translateY(-50%);
+  }
+
+  .photo-caption {
+    font-family: 'Cormorant Garamond', serif;
+    font-style: italic;
+    text-align: center;
+    color: var(--text-muted);
+    font-size: 1.05rem;
+    line-height: 1.75;
+    max-width: 380px;
+    margin: 0 auto;
+  }
+
+  /* ── NARRATIVE ── */
+  #narrative {
+    background: var(--charcoal);
+    color: var(--beige);
+    position: relative;
+    overflow: hidden;
+  }
+
+  #narrative::before {
+    content: '"';
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 28rem;
+    position: absolute;
+    top: -6rem; left: -2rem;
+    opacity: .04;
+    line-height: 1;
+    color: var(--rose-gold-light);
+    pointer-events: none;
+  }
+
+  .narrative-title {
+    font-family: 'Cormorant Garamond', serif;
+    font-weight: 300;
+    font-size: clamp(1.6rem, 4vw, 3rem);
+    text-align: center;
+    margin-bottom: 3.5rem;
+    color: var(--beige);
+    line-height: 1.25;
+  }
+
+  .narrative-title span { color: var(--rose-gold-light); font-style: italic; }
+
+  .narrative-body {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: clamp(1.1rem, 2.4vw, 1.35rem);
+    line-height: 1.95;
+    color: #C8BFB4;
+    text-align: center;
+    max-width: 660px;
+    margin: 0 auto;
+  }
+
+  /* ── VIDEOS ── */
+  #videos {
+    background: var(--cream);
+  }
+
+  .video-section-title {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: clamp(1.5rem, 3.5vw, 2.4rem);
+    text-align: center;
+    margin-bottom: 3.5rem;
+    font-weight: 300;
+  }
+
+  .video-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 2rem;
+  }
+
+  @media (max-width: 640px) {
+    .video-grid { grid-template-columns: 1fr; }
+  }
+
+  .video-card {
+    background: var(--beige);
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 4px 24px rgba(44,44,44,.07);
+    transition: transform .3s ease, box-shadow .3s ease;
+  }
+
+  .video-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 12px 40px rgba(44,44,44,.12);
+  }
+
+  .video-wrapper {
+    position: relative;
+    padding-top: 75%;
+    background: #1a1a1a;
+  }
+
+  .video-wrapper video {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .video-label {
+    padding: 1.25rem 1.5rem;
+  }
+
+  .video-label .tag {
+    font-size: .65rem;
+    letter-spacing: .3em;
+    text-transform: uppercase;
+    color: var(--rose-gold);
+    font-family: 'Jost', sans-serif;
+    font-weight: 200;
+    display: block;
+    margin-bottom: .35rem;
+  }
+
+  .video-label h3 {
+    font-family: 'Cormorant Garamond', serif;
+    font-weight: 400;
+    font-size: 1.15rem;
+    color: var(--charcoal);
+  }
+
+  /* ── TIMELINE ── */
+  #timeline {
+    background: var(--beige-dark);
+  }
+
+  .timeline-title {
+    font-family: 'Cormorant Garamond', serif;
+    font-weight: 300;
+    font-size: clamp(1.5rem, 3.5vw, 2.4rem);
+    text-align: center;
+    margin-bottom: 4rem;
+  }
+
+  .timeline-track {
+    position: relative;
+    max-width: 500px;
+    margin: 0 auto;
+    padding-left: 2.5rem;
+  }
+
+  .timeline-track::before {
+    content: '';
+    position: absolute;
+    left: 0; top: 0; bottom: 0;
+    width: 1px;
+    background: linear-gradient(to bottom, var(--rose-gold), var(--rose-gold-light), transparent);
+  }
+
+  .t-item {
+    position: relative;
+    margin-bottom: 3.5rem;
+    opacity: 0;
+    transform: translateX(-18px);
+    transition: opacity .7s ease, transform .7s ease;
+  }
+
+  .t-item.visible { opacity: 1; transform: translateX(0); }
+
+  .t-dot {
+    position: absolute;
+    left: -2.7rem;
+    top: .3rem;
+    width: 10px; height: 10px;
+    border-radius: 50%;
+    background: var(--rose-gold);
+    box-shadow: 0 0 0 4px rgba(184,134,106,.18);
+  }
+
+  .t-year {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 2rem;
+    font-weight: 300;
+    color: var(--rose-gold);
+    line-height: 1;
+    margin-bottom: .4rem;
+  }
+
+  .t-title {
+    font-family: 'Jost', sans-serif;
+    font-weight: 400;
+    font-size: .8rem;
+    letter-spacing: .2em;
+    text-transform: uppercase;
+    color: var(--charcoal);
+    margin-bottom: .4rem;
+  }
+
+  .t-desc {
+    font-family: 'Cormorant Garamond', serif;
+    font-style: italic;
+    color: var(--text-muted);
+    font-size: 1rem;
+    line-height: 1.65;
+  }
+
+  /* ── FOOTER / MESSAGE ── */
+  #footer {
+    background: var(--charcoal);
+    text-align: center;
+    padding: 7rem 1.5rem 5rem;
+    position: relative;
+    overflow: hidden;
+  }
+
+  #footer::after {
+    content: '22';
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 26rem;
+    font-weight: 600;
+    position: absolute;
+    bottom: -4rem; right: -2rem;
+    opacity: .03;
+    color: var(--rose-gold);
+    pointer-events: none;
+    line-height: 1;
+  }
+
+  .footer-closing {
+    font-family: 'Cormorant Garamond', serif;
+    font-style: italic;
+    font-size: clamp(1.1rem, 2.5vw, 1.5rem);
+    color: #C8BFB4;
+    margin-bottom: 3rem;
+    line-height: 1.75;
+  }
+
+  .reveal-btn {
+    display: inline-block;
+    font-family: 'Jost', sans-serif;
+    font-weight: 300;
+    font-size: .78rem;
+    letter-spacing: .3em;
+    text-transform: uppercase;
+    color: var(--rose-gold-light);
+    border: 1px solid var(--rose-gold);
+    padding: 1rem 2.5rem;
+    border-radius: 999px;
+    cursor: pointer;
+    background: transparent;
+    transition: background .3s, color .3s, transform .2s;
+    position: relative;
+    z-index: 2;
+  }
+
+  .reveal-btn:hover {
+    background: var(--rose-gold);
+    color: var(--cream);
+    transform: scale(1.04);
+  }
+
+  .secret-message {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 1s ease, opacity .8s ease;
+    opacity: 0;
+  }
+
+  .secret-message.open {
+    max-height: 600px;
+    opacity: 1;
+  }
+
+  .secret-inner {
+    margin-top: 3rem;
+    padding: 2.5rem 2rem;
+    border: 1px solid rgba(184,134,106,.25);
+    border-radius: 12px;
+    max-width: 560px;
+    margin-left: auto;
+    margin-right: auto;
+    background: rgba(255,255,255,.03);
+  }
+
+  .secret-inner p {
+    font-family: 'Cormorant Garamond', serif;
+    font-style: italic;
+    font-size: 1.15rem;
+    line-height: 2;
+    color: #D8CFCA;
+    margin-bottom: 1.5rem;
+  }
+
+  .secret-inner .sig {
+    font-family: 'Jost', sans-serif;
+    font-weight: 200;
+    font-size: .75rem;
+    letter-spacing: .25em;
+    text-transform: uppercase;
+    color: var(--rose-gold);
+  }
+
+  /* ── FADE IN SCROLL UTILITY ── */
+  .fade-in {
+    opacity: 0;
+    transform: translateY(28px);
+    transition: opacity .85s ease, transform .85s ease;
+  }
+  .fade-in.visible { opacity: 1; transform: translateY(0); }
+
+  /* ── ANIMATIONS ── */
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(30px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  @keyframes spin {
+    to { transform: rotate(360deg); }
+  }
+
+  /* ── DIVIDER ── */
+  .ornament-line {
+    text-align: center;
+    margin: 1.5rem 0 0;
+    color: var(--rose-gold);
+    letter-spacing: .5em;
+    font-size: .7rem;
+    opacity: .6;
+  }
+
+  /* ── MUSIC PLAYER ── */
+  #music-player {
+    position: fixed;
+    bottom: 2rem;
+    right: 2rem;
+    z-index: 999;
+    display: flex;
+    align-items: center;
+    gap: .75rem;
+    background: rgba(44,44,44,.88);
+    backdrop-filter: blur(14px);
+    border: 1px solid rgba(184,134,106,.35);
+    border-radius: 999px;
+    padding: .55rem 1.25rem .55rem .55rem;
+    box-shadow: 0 8px 32px rgba(0,0,0,.28);
+    transition: opacity .4s;
+  }
+  #music-player:hover { opacity: 1 !important; }
+
+  #music-btn {
+    width: 40px; height: 40px;
+    border-radius: 50%;
+    border: 1px solid var(--rose-gold);
+    background: transparent;
+    color: var(--rose-gold-light);
+    font-size: 1.1rem;
+    cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    transition: background .25s, transform .2s;
+    flex-shrink: 0;
+  }
+  #music-btn:hover { background: var(--rose-gold); color: var(--cream); transform: scale(1.08); }
+
+  #music-icon { display: inline-block; }
+  #music-icon.playing { animation: pulse-note 1.6s ease infinite; }
+
+  #music-label {
+    font-family: 'Jost', sans-serif;
+    font-weight: 200;
+    font-size: .62rem;
+    letter-spacing: .22em;
+    text-transform: uppercase;
+    color: #C8BFB4;
+    white-space: nowrap;
+    line-height: 1.3;
+  }
+  #music-label small {
+    display: block;
+    font-size: .55rem;
+    opacity: .6;
+    letter-spacing: .15em;
+  }
+
+  @keyframes pulse-note {
+    0%, 100% { transform: scale(1) rotate(0deg);   opacity: 1;  }
+    50%       { transform: scale(1.25) rotate(8deg); opacity: .7; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ── MUSIC PLAYER ── -->
+<div id="music-player">
+  <button id="music-btn" onclick="toggleMusic()" title="Play / Pause">
+    <span id="music-icon">♪</span>
+  </button>
+  <div id="music-label">
+    Happy Birthday
+    <small>playing for rahayu ✦</small>
+  </div>
+</div>
+
+<!-- ── HERO ── -->
+<section id="hero">
+  <canvas id="particle-canvas"></canvas>
+  <div class="hero-inner">
+    <span class="hero-eyebrow">The Architecture of Us</span>
+    <h1 class="hero-title">Happy 22nd Birthday,<br><em>Rahayu Maulidina.</em></h1>
+    <p class="hero-dates">11 Mei 2004 &nbsp;—&nbsp; 11 Mei 2026</p>
+    <p class="hero-copy">
+      Dua puluh dua tahun bukan sekadar angka,<br>
+      melainkan tumpukan dialog yang membangun kedewasaan.
+    </p>
+    <div class="hero-ornament"></div>
+  </div>
+</section>
+
+<!-- ── PHOTO ── -->
+<section id="photo-section">
+  <div class="container">
+    <span class="section-label fade-in">The Core Image</span>
+    <div class="photo-frame fade-in">
+      <div class="photo-ring"></div>
+      <img src="WhatsApp_Image_2026-05-10_at_23_20_00.jpeg" alt="Rahayu Maulidina">
+    </div>
+    <p class="photo-caption fade-in">
+      "Satu wajah, sejuta cerita,<br>dan ribuan diskusi yang telah kita lalui."
+    </p>
+  </div>
+</section>
+
+<!-- ── NARRATIVE ── -->
+<section id="narrative">
+  <div class="container">
+    <h2 class="narrative-title fade-in">Makin Dewasa,<br><span>Makin Banyak Diskusi</span></h2>
+    <p class="narrative-body fade-in">
+      Dulu, diskusi kita mungkin hanya tentang warna kesukaan atau mimpi-mimpi kecil. 
+      Seiring waktu, diskusi itu berubah menjadi debat tentang realita, pertukaran pikiran 
+      tentang masa depan, hingga hening yang paling dipahami. Makin dewasa kita, makin kita 
+      sadar bahwa kedewasaan tidak lahir dari kesepakatan terus-menerus, tapi dari 
+      diskusi-diskusi berat yang berhasil kita selesaikan bersama.
+    </p>
+    <div class="ornament-line fade-in">· · ·</div>
+  </div>
+</section>
+
+<!-- ── VIDEOS ── -->
+<section id="videos">
+  <div class="container">
+    <span class="section-label fade-in">The Video Archives</span>
+    <h2 class="video-section-title fade-in">22 Years of <em style="font-family:'Cormorant Garamond',serif;font-style:italic;color:var(--rose-gold)">Conversations</em></h2>
+    <div class="video-grid">
+      <div class="video-card fade-in">
+        <div class="video-wrapper">
+          <video controls playsinline preload="metadata">
+            <source src="WhatsApp_Video_2026-05-10_at_23_19_59__1_.mp4" type="video/mp4">
+          </video>
+        </div>
+        <div class="video-label">
+          <span class="tag">Chapter One</span>
+          <h3>The Echo of Laughter</h3>
+        </div>
+      </div>
+      <div class="video-card fade-in" style="transition-delay:.15s">
+        <div class="video-wrapper">
+          <video controls playsinline preload="metadata">
+            <source src="WhatsApp_Video_2026-05-10_at_23_19_59.mp4" type="video/mp4">
+          </video>
+        </div>
+        <div class="video-label">
+          <span class="tag">Chapter Two</span>
+          <h3>The Depth of Maturity</h3>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── TIMELINE ── -->
+<section id="timeline">
+  <div class="container">
+    <span class="section-label fade-in">Interactive Timeline</span>
+    <h2 class="timeline-title fade-in">2004 <span style="color:var(--rose-gold);font-style:italic;font-family:'Cormorant Garamond',serif">—</span> 2026</h2>
+    <div class="timeline-track">
+      <div class="t-item">
+        <div class="t-dot"></div>
+        <div class="t-year">2004</div>
+        <div class="t-title">Where It All Began</div>
+        <p class="t-desc">Seorang jiwa lahir ke dunia — belum tahu betapa banyak percakapan yang menantinya.</p>
+      </div>
+      <div class="t-item">
+        <div class="t-dot"></div>
+        <div class="t-year">2023</div>
+        <div class="t-title">Evolution of Our Dialogues</div>
+        <p class="t-desc">Since 2023 — diskusi berubah bentuk. Lebih dalam, lebih jujur, lebih bermakna dari sebelumnya.</p>
+      </div>
+      <div class="t-item">
+        <div class="t-dot"></div>
+        <div class="t-year">2026</div>
+        <div class="t-title">Right Here, Right Now</div>
+        <p class="t-desc">Ready for more discussions. Dua puluh dua tahun — dan masih banyak kata yang belum terucap.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── FOOTER ── -->
+<section id="footer">
+  <div class="container" style="position:relative;z-index:2;">
+    <span class="section-label" style="color:var(--rose-gold-light);">Private Message</span>
+    <p class="footer-closing">
+      "Selamat berdiskusi dengan usia yang baru,<br>
+      <em>Sayangku.</em>"
+    </p>
+    <button class="reveal-btn" onclick="toggleMessage(this)">Buka Pesan Tersembunyi</button>
+    <div class="secret-message" id="secretMsg">
+      <div class="secret-inner">
+        <p>
+          Rahayu, di antara semua diskusi yang pernah kita jalani — tentang hidup, tentang mimpi, tentang hal-hal yang kadang membuat kita diam — satu hal yang selalu pasti: aku selalu ingin ada di setiap babnya.
+        </p>
+        <p>
+          Selamat memasuki babak kedua puluh dua. Semoga tiap diskusi baru yang datang hanya memperkuat fondasi yang sudah kita bangun bersama.
+        </p>
+        <p>
+          Aku sayang kamu — hari ini, dan di semua diskusi yang masih menunggu.
+        </p>
+        <span class="sig">— Dengan sepenuh hati ✦</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<script>
+// ── PARTICLES ──
+(function() {
+  const canvas = document.getElementById('particle-canvas');
+  const ctx = canvas.getContext('2d');
+  let W, H, particles = [];
+
+  function resize() {
+    W = canvas.width = canvas.offsetWidth;
+    H = canvas.height = canvas.offsetHeight;
+  }
+
+  function Particle() {
+    this.x = Math.random() * W;
+    this.y = Math.random() * H;
+    this.r = Math.random() * 1.5 + .3;
+    this.vx = (Math.random() - .5) * .3;
+    this.vy = (Math.random() - .5) * .3;
+    this.alpha = Math.random() * .6 + .2;
+  }
+
+  function init() {
+    resize();
+    particles = Array.from({length: 90}, () => new Particle());
+  }
+
+  function draw() {
+    ctx.clearRect(0, 0, W, H);
+    particles.forEach(p => {
+      ctx.beginPath();
+      ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+      ctx.fillStyle = `rgba(184,134,106,${p.alpha})`;
+      ctx.fill();
+      p.x += p.vx; p.y += p.vy;
+      if (p.x < 0 || p.x > W) p.vx *= -1;
+      if (p.y < 0 || p.y > H) p.vy *= -1;
+    });
+    requestAnimationFrame(draw);
+  }
+
+  window.addEventListener('resize', resize);
+  init(); draw();
+})();
+
+// ── SCROLL REVEAL ──
+const io = new IntersectionObserver((entries) => {
+  entries.forEach(e => {
+    if (e.isIntersecting) {
+      e.target.classList.add('visible');
+    }
+  });
+}, { threshold: .15 });
+
+document.querySelectorAll('.fade-in, .t-item').forEach(el => io.observe(el));
+
+// ── SECRET MESSAGE ──
+function toggleMessage(btn) {
+  const msg = document.getElementById('secretMsg');
+  const open = msg.classList.toggle('open');
+  btn.textContent = open ? 'Tutup Pesan' : 'Buka Pesan Tersembunyi';
+}
+
+// ── HAPPY BIRTHDAY MUSIC (Web Audio API) ──
+(function() {
+  let ctx, playing = false, scheduledNodes = [], loopTimer = null;
+  const icon  = document.getElementById('music-icon');
+  const player = document.getElementById('music-player');
+
+  // Happy Birthday notes: [note_hz, duration_beats]
+  // Key of F, tempo 72 bpm
+  const BPM = 72;
+  const BEAT = 60 / BPM;
+  const notes = [
+    // "Hap-py Birth-day to you"
+    [349.23,0.75],[349.23,0.25],[392.00,1],[349.23,1],[466.16,1],[440.00,2],
+    // "Hap-py Birth-day to you"
+    [349.23,0.75],[349.23,0.25],[392.00,1],[349.23,1],[523.25,1],[466.16,2],
+    // "Hap-py Birth-day dear Ra-ha-yu"
+    [349.23,0.75],[349.23,0.25],[698.46,1],[587.33,1],[466.16,1],[440.00,1],[392.00,2],
+    // "Hap-py Birth-day to you"
+    [622.25,0.75],[622.25,0.25],[587.33,1],[466.16,1],[523.25,1],[466.16,3],
+  ];
+
+  function playMelody(startTime) {
+    scheduledNodes = [];
+    let t = startTime;
+    notes.forEach(([freq, beats]) => {
+      const dur = beats * BEAT;
+
+      // Oscillator (sine + slight triangle blend for warmth)
+      const osc1 = ctx.createOscillator();
+      const osc2 = ctx.createOscillator();
+      osc1.type = 'sine';
+      osc2.type = 'triangle';
+      osc1.frequency.value = freq;
+      osc2.frequency.value = freq;
+
+      const gain = ctx.createGain();
+      gain.gain.setValueAtTime(0, t);
+      gain.gain.linearRampToValueAtTime(0.18, t + 0.03);
+      gain.gain.setValueAtTime(0.18, t + dur - 0.08);
+      gain.gain.linearRampToValueAtTime(0, t + dur);
+
+      const gain2 = ctx.createGain();
+      gain2.gain.value = 0.04;
+
+      // Reverb-like delay
+      const delay = ctx.createDelay(0.3);
+      delay.delayTime.value = 0.22;
+      const delayGain = ctx.createGain();
+      delayGain.gain.value = 0.18;
+
+      osc1.connect(gain);
+      osc2.connect(gain2);
+      gain2.connect(gain);
+      gain.connect(ctx.destination);
+      gain.connect(delay);
+      delay.connect(delayGain);
+      delayGain.connect(ctx.destination);
+
+      osc1.start(t); osc1.stop(t + dur + 0.1);
+      osc2.start(t); osc2.stop(t + dur + 0.1);
+      scheduledNodes.push(osc1, osc2);
+
+      t += dur;
+    });
+    return t; // returns end time
+  }
+
+  function getTotalDuration() {
+    return notes.reduce((s, [,b]) => s + b * BEAT, 0);
+  }
+
+  function startMusic() {
+    if (!ctx) ctx = new (window.AudioContext || window.webkitAudioContext)();
+    if (ctx.state === 'suspended') ctx.resume();
+
+    const now = ctx.currentTime + 0.1;
+    playMelody(now);
+    playing = true;
+    icon.classList.add('playing');
+
+    // Loop
+    const dur = getTotalDuration();
+    loopTimer = setInterval(() => {
+      if (!playing) return;
+      playMelody(ctx.currentTime + 0.05);
+    }, (dur + 0.3) * 1000);
+  }
+
+  function stopMusic() {
+    clearInterval(loopTimer);
+    scheduledNodes.forEach(n => { try { n.stop(); } catch(e){} });
+    scheduledNodes = [];
+    playing = false;
+    icon.classList.remove('playing');
+  }
+
+  window.toggleMusic = function() {
+    if (playing) { stopMusic(); }
+    else { startMusic(); }
+  };
+
+  // Auto-play on first interaction
+  function tryAutoPlay() {
+    startMusic();
+    ['click','touchstart','keydown'].forEach(e =>
+      document.removeEventListener(e, tryAutoPlay));
+  }
+
+  // Try immediately (works if page was already interacted with)
+  try {
+    const testCtx = new (window.AudioContext || window.webkitAudioContext)();
+    if (testCtx.state === 'running') {
+      ctx = testCtx;
+      startMusic();
+    } else {
+      testCtx.close();
+      ['click','touchstart','keydown'].forEach(e =>
+        document.addEventListener(e, tryAutoPlay, { once: true }));
+    }
+  } catch(e) {
+    ['click','touchstart','keydown'].forEach(ev =>
+      document.addEventListener(ev, tryAutoPlay, { once: true }));
+  }
+
+  // Fade opacity when idle
+  let idleTimer;
+  function resetIdle() {
+    player.style.opacity = '1';
+    clearTimeout(idleTimer);
+    idleTimer = setTimeout(() => { player.style.opacity = '.5'; }, 4000);
+  }
+  document.addEventListener('mousemove', resetIdle);
+  document.addEventListener('touchstart', resetIdle);
+  resetIdle();
+})();
+</script>
+
+</body>
+</html>
